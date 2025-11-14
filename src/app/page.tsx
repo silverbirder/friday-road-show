@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { data } from "../data";
 import type { FridayShow } from "../data";
 
@@ -9,15 +8,15 @@ function getMonthlyTop5(data: FridayShow[]): MonthlyRanking {
   const monthlyCount: Record<number, Record<string, number>> = {};
   for (const { date, title } of data) {
     const month = Number(date.split("/")[1]);
-    if (!monthlyCount[month]) monthlyCount[month] = {};
-    if (!monthlyCount[month][title]) monthlyCount[month][title] = 0;
-    monthlyCount[month][title]!++;
+    monthlyCount[month] ??= {};
+    monthlyCount[month][title] ??= 0;
+    monthlyCount[month][title]++;
   }
   // 月ごとにランキングを作成
   const monthlyRanking: MonthlyRanking = {};
   for (let m = 1; m <= 12; m++) {
     if (!monthlyCount[m]) continue;
-    const sorted = Object.entries(monthlyCount[m] as Record<string, number>)
+    const sorted = Object.entries(monthlyCount[m]!)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5);
     monthlyRanking[m] = sorted;
@@ -45,7 +44,7 @@ export default function HomePage() {
                   {ranking ? (
                     <ol className="ml-5 list-decimal">
                       {ranking.map(
-                        ([title, count]: [string, number], idx: number) => (
+                        ([title, count]: [string, number], _idx: number) => (
                           <li key={title}>
                             <span className="font-semibold">{title}</span>
                             <span className="ml-2 text-sm text-gray-300">
